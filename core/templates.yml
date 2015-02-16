@@ -83,8 +83,7 @@ keys:
         type: int
         format_spec: "02"
         alias: DD
-    hiero.project:
-        alias: project
+    project:
         type: str
         
     # These are used for the Mari UDIM pipeline:        
@@ -290,8 +289,8 @@ paths:
     #
 
     # export of shot asset data from hiero
-    hiero_plate_path:       'sequences/{Sequence}/{Shot}/editorial/{YYYY}_{MM}_{DD}/plates/{hiero.project}_{Shot}.mov'
-    hiero_render_path:      'sequences/{Sequence}/{Shot}/editorial/{YYYY}_{MM}_{DD}/renders/{hiero.project}_{Shot}.{SEQ}.dpx'
+    hiero_plate_path:       'sequences/{Sequence}/{Shot}/editorial/{YYYY}_{MM}_{DD}/plates/{project}_{Shot}.mov'
+    hiero_render_path:      'sequences/{Sequence}/{Shot}/editorial/{YYYY}_{MM}_{DD}/renders/{project}_{Shot}.{SEQ}.dpx'
 
 
     #
