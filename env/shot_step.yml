@@ -481,7 +481,8 @@ engines:
         action_mappings:
           Nuke Script: [script_import]
           Rendered Image: [read_node]
-        actions_hook: '{self}/tk-nuke_actions.py'
+          Alembic Cache: [read_node]
+        actions_hook: tk-nuke_loader_actions_abc
         download_thumbnails: true
         entities:
         - caption: Assets
