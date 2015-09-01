@@ -278,7 +278,8 @@ engines:
           Maya Scene: [reference, import]
           Photoshop Image: [texture_node]
           Rendered Image: [texture_node]
-        actions_hook: '{self}/tk-maya_actions.py'
+          Alembic Cache: [import]
+        actions_hook: tk-maya_loader_actions_abc
         download_thumbnails: true
         entities:
         - caption: Assets
