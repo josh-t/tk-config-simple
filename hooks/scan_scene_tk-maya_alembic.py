@@ -70,7 +70,10 @@ class ScanSceneHook(Hook):
         # look for root level groups that have meshes as children:
         for grp in cmds.ls(assemblies=True, long=True):
             if cmds.ls(grp, dag=True, type="mesh"):
-                # include this group as a 'mesh_group' type
-                items.append({"type":"mesh_group", "name":grp})
+                # Include this group as a 'mesh_group' type. Once we find one
+                # we will return, as we're taking the simple approach and exporting
+                # a single abc for all meshes in the scene.
+                items.append({"type":"mesh_group", "name":name})
+                return items
 
         return items
