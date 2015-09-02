@@ -402,9 +402,9 @@ engines:
         hook_post_publish: default
         hook_primary_pre_publish: default
         hook_primary_publish: default
-        hook_scan_scene: default
-        hook_secondary_pre_publish: default
-        hook_secondary_publish: default
+        hook_scan_scene: scan_scene_tk-maya_shader_networks
+        hook_secondary_pre_publish: secondary_pre_publish_tk-maya
+        hook_secondary_publish: secondary_publish_tk-maya
         hook_thumbnail: default
         location: {name: tk-multi-publish, type: app_store, version: v0.6.2}
         primary_description: Publish and version up the current Maya scene
@@ -424,6 +424,16 @@ engines:
           scene_item_type: geometry
           selected: false
           tank_type: Alembic Cache
+        - description: Publish shader network for all geometry in the scene
+          display_group: Shader Network
+          display_name: Maya Shader Network
+          icon: 'icons/maya_shader_network_publish.png'
+          name: maya_shader_network
+          publish_template: maya_asset_shader_network
+          required: false
+          scene_item_type: shader_network
+          selected: false
+          tank_type: 'Maya Shader Network'
         template_work: maya_asset_work
       tk-multi-screeningroom: '@launch_screeningroom'
       tk-multi-snapshot:

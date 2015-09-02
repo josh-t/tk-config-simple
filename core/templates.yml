@@ -228,6 +228,7 @@ paths:
         definition: '@shot_root/quickreview/review_{timestamp}.mov'
         root_name: 'primary'
 
+    maya_shot_mesh_alembic_cache: '@shot_root/publish/maya/{name}[_{grp_name}].v{version}.abc'
 
 
     #
@@ -475,7 +476,11 @@ paths:
     maya_asset_quickreview:
         definition: '@asset_root/quickreview/review_{timestamp}.mov'
         root_name: 'primary'
-    maya_shot_mesh_alembic_cache: '@shot_root/publish/maya/{name}[_{grp_name}].v{version}.abc'
+
+    # The location where maya shader networks are stored on disk
+    maya_asset_shader_network:
+        definition: '@asset_root/publish/maya/surfacing/{name}[_{grp_name}].v{version}.ma'
+        root_name: 'primary'
 
     #
     # Houdini
