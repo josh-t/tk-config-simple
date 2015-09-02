@@ -1,18 +1,17 @@
 
+*.py[co]
+
+# Ignore vim temporary and swap files
+*~
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+
+# ignore some auto-generated stuff
 core/shotgun.yml
-
 core/app_store.yml
-
-core/hooks/pick_environment.pyc
-
 core/install_location.yml
-
 core/interpreter_Darwin.cfg
-
 core/interpreter_Linux.cfg
-
 core/interpreter_Windows.cfg
-
 core/pipeline_configuration.yml
 
-hooks/scan_scene_tk-maya_alembic.pyc

@@ -279,6 +279,7 @@ engines:
           Photoshop Image: [texture_node]
           Rendered Image: [texture_node]
           Alembic Cache: [import]
+          Maya Shader Network: [import]
         actions_hook: tk-maya_loader_actions_abc
         download_thumbnails: true
         entities:
