@@ -71,9 +71,14 @@ class ScanSceneHook(Hook):
         for grp in cmds.ls(assemblies=True, long=True):
             if cmds.ls(grp, dag=True, type="mesh"):
                 # Include this group as a 'mesh_group' type. Once we find one
-                # we will return, as we're taking the simple approach and exporting
-                # a single abc for all meshes in the scene.
+                # we break, as we're taking the simple approach and exporting a
+                # single abc for all meshes in the scene.
                 items.append({"type":"mesh_group", "name":name})
-                return items
+                break
+
+        # look for cameras to publish
+        for camera in cmds.listCameras(perspective=True):
+            items.append({"type": "camera", "name": camera}) 
 
         return items
+

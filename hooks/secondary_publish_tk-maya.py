@@ -9,6 +9,7 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 import os
+import re
 import shutil
 import maya.cmds as cmds
 import maya.mel as mel
@@ -104,14 +105,23 @@ class PublishHook(Hook):
             # publish alembic_cache output
             if output["name"] == "alembic_cache":
                 try:
-                   self.__publish_alembic_cache(item, output, work_template, primary_publish_path, 
-                                                         sg_task, comment, thumbnail_path, progress_cb)
+                   self.__publish_alembic_cache(item, output, work_template,
+                       primary_publish_path, sg_task, comment, thumbnail_path,
+                       progress_cb)
+                except Exception, e:
+                   errors.append("Publish failed - %s" % e)
+            elif output["name"] == "camera":
+                try:
+                   self.__publish_camera(item, output, work_template,
+                       primary_publish_path, sg_task, comment, thumbnail_path,
+                       progress_cb)
                 except Exception, e:
                    errors.append("Publish failed - %s" % e)
             elif output["name"] == "maya_shader_network":
                 try:
-                   self.__publish_maya_shader_network(item, output, work_template, primary_publish_path, 
-                                                         sg_task, comment, thumbnail_path, progress_cb)
+                   self.__publish_maya_shader_network(item, output,
+                       work_template, primary_publish_path, sg_task, comment,
+                       thumbnail_path, progress_cb)
                 except Exception, e:
                    errors.append("Publish failed - %s" % e)
             else:
@@ -215,10 +225,10 @@ class PublishHook(Hook):
         }
         tank.util.register_publish(**args)
 
-    def __publish_maya_shader_network(self, item, output, work_template, primary_publish_path, 
-                                        sg_task, comment, thumbnail_path, progress_cb):
+    def __publish_camera(self, item, output, work_template,
+        primary_publish_path, sg_task, comment, thumbnail_path, progress_cb):
         """
-        Publish an Alembic cache file for the scene and publish it to Shotgun.
+        Publish a shot camera and register with Shotgun.
         
         :param item:                    The item to publish
         :param output:                  The output definition to publish with
@@ -240,7 +250,9 @@ class PublishHook(Hook):
         fields = work_template.get_fields(scene_path)
         publish_version = fields["version"]
         tank_type = output["tank_type"]
-        fields['grp_name'] = item['name'].replace(':', '_').replace('|', '_')
+        cam_name = item['name']
+        fields['obj_name'] = cam_name
+        fields['name'] = re.sub(r'[\W_]+', '', cam_name)
                 
         # create the publish path by applying the fields 
         # with the publish template:
@@ -252,7 +264,77 @@ class PublishHook(Hook):
         self.parent.ensure_folder_exists(publish_folder)
 
         # determine the publish name:
-        publish_name = fields.get("name")
+        publish_name = fields.get("obj_name")
+        if not publish_name:
+            publish_name = os.path.basename(publish_path)
+        
+        # Find additional info from the scene:
+        #
+        progress_cb(10, "Analysing scene")
+
+        cmds.select(cam_name, replace=True)
+
+        # write a .ma file to the publish path with the camera definitions
+        progress_cb(25, "Exporting the camera.")        
+        cmds.file(publish_path, type='mayaAscii', exportSelected=True,
+            options="v=0", prompt=False, force=True)
+
+        # register the publish:
+        progress_cb(75, "Registering the publish")        
+        args = {
+            "tk": self.parent.tank,
+            "context": self.parent.context,
+            "comment": comment,
+            "path": publish_path,
+            "name": publish_name,
+            "version_number": publish_version,
+            "thumbnail_path": thumbnail_path,
+            "task": sg_task,
+            "dependency_paths": [primary_publish_path],
+            "published_file_type":tank_type
+        }
+        tank.util.register_publish(**args)
+
+    def __publish_maya_shader_network(self, item, output, work_template, primary_publish_path, 
+                                        sg_task, comment, thumbnail_path, progress_cb):
+        """
+        Publish shader networks for the asset and register with Shotgun.
+        
+        :param item:                    The item to publish
+        :param output:                  The output definition to publish with
+        :param work_template:           The work template for the current scene
+        :param primary_publish_path:    The path to the primary published file
+        :param sg_task:                 The Shotgun task we are publishing for
+        :param comment:                 The publish comment/description
+        :param thumbnail_path:          The path to the publish thumbnail
+        :param progress_cb:             A callback that can be used to report progress
+        """
+
+        # determine the publish info to use
+        #
+        progress_cb(10, "Determining publish details")
+
+        # get the current scene path and extract fields from it
+        # using the work template:
+        scene_path = os.path.abspath(cmds.file(query=True, sn=True))
+        fields = work_template.get_fields(scene_path)
+        publish_version = fields["version"]
+        tank_type = output["tank_type"]
+        shader_name = item['name']
+        fields['obj_name'] = shader_name
+        fields['name'] = re.sub(r'[\W_]+', '', shader_name)
+
+        # create the publish path by applying the fields 
+        # with the publish template:
+        publish_template = output["publish_template"]
+        publish_path = publish_template.apply_fields(fields)
+        
+        # ensure the publish folder exists:
+        publish_folder = os.path.dirname(publish_path)
+        self.parent.ensure_folder_exists(publish_folder)
+
+        # determine the publish name:
+        publish_name = fields.get("obj_name")
         if not publish_name:
             publish_name = os.path.basename(publish_path)
         
@@ -263,8 +345,8 @@ class PublishHook(Hook):
         # there's probably a better way to do this. i am jon snow (i know
         # nothing)
         shading_groups = set()
-        if cmds.ls(item['name'], dag=True, type="mesh"):
-            faces = cmds.polyListComponentConversion(item['name'], toFace=True)
+        if cmds.ls(shader_name, dag=True, type="mesh"):
+            faces = cmds.polyListComponentConversion(shader_name, toFace=True)
             for shading_group in cmds.listSets(type=1, object=faces[0]):
                 shading_groups.add(shading_group)
 
@@ -276,7 +358,7 @@ class PublishHook(Hook):
                 shaders.add(shader)        
 
         if not shaders:
-            progress_cb(25, "No shader networks to export.")        
+            progress_cb(100, "No shader networks to export.")        
             return
 
         cmds.select(list(shaders), replace=True)

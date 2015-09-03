@@ -40,6 +40,8 @@ keys:
     name:
         type: str
         filter_by: alphanumeric
+    obj_name:
+        type: str
     iteration:
         type: int
     version:
@@ -228,7 +230,13 @@ paths:
         definition: '@shot_root/quickreview/review_{timestamp}.mov'
         root_name: 'primary'
 
-    maya_shot_mesh_alembic_cache: '@shot_root/publish/maya/{name}[_{grp_name}].v{version}.abc'
+    maya_shot_mesh_alembic_cache:
+        definition: '@shot_root/publish/maya/{name}[_{grp_name}].v{version}.abc'
+        root_name: 'primary'
+
+    maya_shot_camera:
+        definition: '@shot_root/publish/maya/camera/{name}.v{version}.ma'
+        root_name: 'primary'
 
 
     #
@@ -479,7 +487,7 @@ paths:
 
     # The location where maya shader networks are stored on disk
     maya_asset_shader_network:
-        definition: '@asset_root/publish/maya/surfacing/{name}[_{grp_name}].v{version}.ma'
+        definition: '@asset_root/publish/maya/surfacing/{name}.v{version}.ma'
         root_name: 'primary'
 
     #

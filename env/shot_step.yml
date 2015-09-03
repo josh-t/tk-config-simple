@@ -279,7 +279,8 @@ engines:
           Photoshop Image: [texture_node]
           Rendered Image: [texture_node]
           Alembic Cache: [import]
-          Maya Shader Network: [import]
+          Camera: [reference, import]
+          Maya Shader Network: [reference, import]
         actions_hook: tk-maya_loader_actions_abc
         download_thumbnails: true
         entities:
@@ -312,9 +313,9 @@ engines:
         hook_post_publish: default
         hook_primary_pre_publish: default
         hook_primary_publish: default
-        hook_scan_scene: scan_scene_tk-maya_alembic
-        hook_secondary_pre_publish: default
-        hook_secondary_publish: default
+        hook_scan_scene: scan_scene_tk-maya
+        hook_secondary_pre_publish: secondary_pre_publish_tk-maya
+        hook_secondary_publish: secondary_publish_tk-maya
         hook_thumbnail: default
         location: {name: tk-multi-publish, type: app_store, version: v0.6.2}
         primary_description: Publish and version up the current Maya scene
@@ -324,6 +325,16 @@ engines:
         primary_scene_item_type: work_file
         primary_tank_type: Maya Scene
         secondary_outputs:
+        - description: 'Publish a camera'
+          display_group: Cameras
+          display_name: Camera
+          icon: 'icons/camera.png'
+          name: camera
+          publish_template: maya_shot_camera
+          required: false
+          scene_item_type: camera
+          selected: false
+          tank_type: 'Camera'
         - description: 'Publish Alembic Cache data for the model'
           display_group: Caches
           display_name: Alembic Cache
